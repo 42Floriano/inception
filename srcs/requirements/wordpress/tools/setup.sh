@@ -7,6 +7,16 @@ until mariadb-admin ping -hmariadb -u"$MYSQL_USER" -p"$MYSQL_PASSWORD" --skip-ss
   sleep 2
 done
 
+# Extract WordPress if needed
+if [ ! -f /var/www/html/index.php ]; then
+  echo "⚙️ Extracting WordPress..."
+  curl -O https://wordpress.org/latest.tar.gz && \
+  tar -xzf latest.tar.gz && \
+  rm latest.tar.gz && \
+  mv wordpress/* /var/www/html && \
+  chown -R 82:82 /var/www/html
+fi
+
 # Generate wp-config.php from environment
 if [ ! -f /var/www/html/wp-config.php ]; then
   echo "🔧 Generating wp-config.php..."
@@ -16,16 +26,6 @@ if [ ! -f /var/www/html/wp-config.php ]; then
   sed -i "s/username_here/$MYSQL_USER/" /var/www/html/wp-config.php
   sed -i "s/password_here/$MYSQL_PASSWORD/" /var/www/html/wp-config.php
   sed -i "s/localhost/mariadb/" /var/www/html/wp-config.php
-fi
-
-# Extract WordPress if needed
-if [ ! -f /var/www/html/index.php ]; then
-  echo "⚙️ Extracting WordPress..."
-  curl -O https://wordpress.org/latest.tar.gz && \
-  tar -xzf latest.tar.gz && \
-  rm latest.tar.gz && \
-  mv wordpress/* /var/www/html && \
-  chown -R 82:82 /var/www/html
 fi
 
 # Auto-install WordPress if not installed
