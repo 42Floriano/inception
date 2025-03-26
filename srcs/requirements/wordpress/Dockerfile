@@ -45,4 +45,7 @@ WORKDIR /var/www/html
 
 EXPOSE 9000
 
-CMD ["php-fpm", "-F"]
+COPY tools/setup.sh /setup.sh
+RUN chmod +x /setup.sh
+
+CMD ["/setup.sh"]
