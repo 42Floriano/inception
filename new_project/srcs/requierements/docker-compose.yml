@@ -1,9 +1,0 @@
-version: "2.40.0"
-  services:
-  nginx:
-    requirements/nginx/
-    env_file: .env
-    container_name: nginx
-    ports:
-    - "9000"
-    restart: always
