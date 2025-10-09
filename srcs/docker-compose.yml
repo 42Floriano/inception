@@ -3,10 +3,10 @@ services:
     build: ./requirements/nginx
     container_name: nginx
     ports:
-      - "8443:443"
+      - "443:443"
     restart: always
     volumes:
-      - wp_files:/var/www/html
+      - /Users/floriano/Desktop/data/wp_files:/var/www/html
     depends_on:
       - wordpress
     networks:
@@ -17,7 +17,7 @@ services:
     container_name: wordpress
     restart: always
     volumes:
-      - wp_files:/var/www/html
+      - /Users/floriano/Desktop/data/wp_files:/var/www/html
     env_file:
       - .env
     depends_on:
@@ -30,7 +30,7 @@ services:
     container_name: mariadb
     restart: always
     volumes:
-      - mariadb_data:/var/lib/mysql
+      - /Users/floriano/Desktop/data/mariadb_data:/var/lib/mysql
     env_file:
       - .env
     networks:

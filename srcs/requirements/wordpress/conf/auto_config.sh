@@ -8,10 +8,13 @@ while ! mariadb -h"${MARIADB_HOST}" -u"${MARIADB_USER}" -p"${MARIADB_PASSWORD}" 
 done
 echo "✅ Database is ready!"
 
+
+cd /var/www/html
+
 # If WordPress files are missing, download them
 if [ ! -f "wp-load.php" ]; then
     echo "⬇️ Downloading WordPress..."
-    wp core download --allow-root --path='/var/www/html'
+    wp core download --allow-root
 fi
 
 # Download WordPress core if not already present
@@ -22,8 +25,7 @@ if [ ! -f "wp-config.php" ]; then
         --dbname="${MARIADB_DATABASE}" \
         --dbuser="${MARIADB_USER}" \
         --dbpass="${MARIADB_PASSWORD}" \
-        --dbhost="${MARIADB_HOST}" \
-        --path='/var/www/html'
+        --dbhost="${MARIADB_HOST}" 
 
     echo "🛠 Installing WordPress..."
     wp core install \
