@@ -5,19 +5,25 @@ RUN apt update && apt upgrade && apt install nginx -y  \
             openssl -y \
             curl   -y \
             vim  -y\
-            sudo -y
+            sudo -y \
+            bash -y
 
 #creater the ssl folder
 RUN mkdir -p /etc/nginx/ssl
 
 #generate the certificate and stores it 
-RUN openssl req -x509 -nodes -out /etc/nginx/ssl/inception.crt -keyout /etc/ssl/inception.key -subj "/C=CH/ST=VD/L=Lausanne/O=42/OU=42/CN=falberti.42.fr/UID=falberti"
+RUN openssl req -x509 -nodes -days 365 \
+  -newkey rsa:2048 \
+  -keyout /etc/nginx/ssl/inception.key \
+  -out /etc/nginx/ssl/inception.crt \
+  -subj "/C=CH/ST=VD/L=Lausanne/O=42/OU=42/CN=falberti.42.fr/UID=falberti"
 
 #create folder to store nginx config files
 RUN mkdir -p /var/run/nginx
 
 #Replace the nginx file with the one stored in conf
 COPY conf/nginx.conf /etc/nginx/nginx.conf
+COPY conf/default.conf /etc/nginx/conf.d/default.conf
 #COPY conf/default.conf /etc/nginx/nginx/sites-available/default
 
 #Add rights to files
