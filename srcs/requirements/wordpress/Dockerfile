@@ -1,57 +1,32 @@
-FROM php:8.2-fpm-alpine
+FROM debian:bookworm
 
-# Install system deps
-RUN apk update && apk add --no-cache \
-    curl \
-    tar \
-    mariadb-client \
-    libpng-dev \
-    libjpeg-turbo-dev \
-    libwebp-dev \
-    libxpm-dev \
-    libzip-dev \
-    libxml2-dev \
-    oniguruma-dev \
-    freetype-dev \
-    libevent-dev \
-    libmcrypt-dev \
-    icu-dev \
-    openssl-dev \
-    bash \
-    tzdata \
-    autoconf \
-    g++ \
-    make
+RUN apt-get update -y && apt-get upgrade -y && apt-get -y install wget
 
-# Install PHP extensions
-RUN docker-php-ext-install \
-    mysqli \
-    pdo_mysql \
-    xml \
-    zip \
-    opcache \
-    intl
+RUN apt-get install -y php8.2\
+    php-fpm\
+    php-mysql\
+    mariadb-client\
+    curl
 
-# Install WP-CLI
+RUN mkdir -p /run/php
+
+RUN wget https://fr.wordpress.org/wordpress-6.0-fr_FR.tar.gz -P /var/www
+RUN cd /var/www && tar -xzf wordpress-6.0-fr_FR.tar.gz && rm wordpress-6.0-fr_FR.tar.gz
+RUN chown -R root:root /var/www/wordpress
+
+RUN sed -i 's|^listen = .*|listen = 9000|' /etc/php/*/fpm/pool.d/www.conf
+
+
+WORKDIR /var/www/html
+RUN chown -R www-data:www-data /var/www/html
+
 RUN curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar && \
     chmod +x wp-cli.phar && \
     mv wp-cli.phar /usr/local/bin/wp
 
+RUN wp core download --allow-root
 
-# Download and extract WordPress
-RUN curl -O https://wordpress.org/latest.tar.gz && \
-    tar -xzf latest.tar.gz && \
-    rm latest.tar.gz && \
-    mv wordpress /var/www/html
+COPY conf/auto_config.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 
-# Set correct ownership
-RUN chown -R www-data:www-data /var/www/html
-
-WORKDIR /var/www/html
-
-EXPOSE 9000
-
-COPY tools/setup.sh /setup.sh
-RUN chmod +x /setup.sh
-
-CMD ["/setup.sh"]
+ENTRYPOINT ["sh", "/entrypoint.sh"]

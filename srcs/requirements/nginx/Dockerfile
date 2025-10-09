@@ -1,29 +1,32 @@
-# Use a lightweight Alpine-based NGINX image
-FROM alpine:latest
+FROM debian:bookworm
 
-# Install required packages: NGINX and OpenSSL for TLS
-RUN apk update && apk add --no-cache nginx openssl certbot certbot-nginx
+# update and install all the depedencies
+RUN apt update && apt upgrade && apt install nginx -y  \
+            openssl -y \
+            curl   -y \
+            vim  -y\
+            sudo -y
 
-# Create necessary directories for NGINX
-RUN mkdir -p /etc/nginx/ssl /run/nginx /var/www/html
+#creater the ssl folder
+RUN mkdir -p /etc/nginx/ssl
 
-# Generate a self-signed SSL certificate
-RUN openssl req -x509 -nodes -days 365 \
-    -newkey rsa:2048 \
-    -keyout /etc/nginx/ssl/nginx.key \
-    -out /etc/nginx/ssl/nginx.crt \
-    -subj "/C=US/ST=State/L=City/O=Organization/OU=OrgUnit/CN=localhost"
+#generate the certificate and stores it 
+RUN openssl req -x509 -nodes -out /etc/nginx/ssl/inception.crt -keyout /etc/ssl/inception.key -subj "/C=CH/ST=VD/L=Lausanne/O=42/OU=42/CN=falberti.42.fr/UID=falberti"
 
-# Copy the custom NGINX configuration file
+#create folder to store nginx config files
+RUN mkdir -p /var/run/nginx
+
+#Replace the nginx file with the one stored in conf
 COPY conf/nginx.conf /etc/nginx/nginx.conf
-COPY conf/default.conf /etc/nginx/conf.d/default.conf
+#COPY conf/default.conf /etc/nginx/nginx/sites-available/default
 
-# Set up entrypoint script
-COPY tools/setup.sh /setup.sh
-RUN chmod +x /setup.sh
+#Add rights to files
+RUN chmod 755 /var/www/html
+RUN chown -R www-data:www-data /var/www/html
 
-# Expose HTTPS port
-EXPOSE 80 443
+#open the https port
+EXPOSE 443
 
-# Run NGINX
+#launch this and says to docker to keep it in foreground
 CMD ["nginx", "-g", "daemon off;"]
+# ENTRYPOINT ["sh", "setup_nginx.sh"]

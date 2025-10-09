@@ -1,6 +1,14 @@
-FROM mariadb:10.6
+FROM debian:bookworm
 
-COPY conf/my.cnf /etc/mysql/my.cnf
-COPY tools/init.sql /docker-entrypoint-initdb.d/init.sql
+RUN apt update -y && apt upgrade -y && apt install mariadb-server -y
 
-EXPOSE 3306
+COPY conf/50-server.cnf /etc/mysql/mariadb.conf.d/50-server.cnf
+
+COPY tools/setup_mariadb.sh /tmp/setup_mariadb.sh
+
+RUN chmod +x /tmp/setup_mariadb.sh
+
+
+#EXPOSE 3306
+
+ENTRYPOINT ["sh", "/tmp/setup_mariadb.sh"]
