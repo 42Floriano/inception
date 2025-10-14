@@ -14,11 +14,11 @@ RUN chmod +x /tmp/setup_mariadb.sh
 #EXPOSE 3306
 
 # Use tini as the init process (PID 1)
-ENTRYPOINT ["/usr/bin/tini", "--"]
-
+#ENTRYPOINT ["/usr/bin/tini", "--"]
 # Run your MariaDB setup script via tini
-CMD ["/tmp/setup_mariadb.sh"]
+#CMD ["/tmp/setup_mariadb.sh"]
 
-#ENTRYPOINT [ "sh", "/tmp/setup_mariadb.sh" ] 
+#Without tini would work but with PID1 problem
+ENTRYPOINT [ "bash", "/tmp/setup_mariadb.sh" ]
 
 #["/tmp/setup_mariadb.sh"]
