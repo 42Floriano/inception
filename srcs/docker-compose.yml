@@ -2,7 +2,7 @@ services:
   nginx:
     build: ./requirements/nginx
     container_name: nginx
-    imagw: nginx
+    image: nginx
     ports:
       - "443:443"
     restart: always
