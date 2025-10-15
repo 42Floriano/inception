@@ -2,7 +2,6 @@ services:
   nginx:
     build: ./requirements/nginx
     container_name: nginx
-    image: nginx
     ports:
       - "443:443"
     restart: always
@@ -16,7 +15,6 @@ services:
   wordpress:
     build: ./requirements/wordpress
     container_name: wordpress
-    image: wordpress
     restart: always
     volumes:
       - /home/falberti/data/wp_files:/var/www/html
@@ -30,7 +28,6 @@ services:
   mariadb:
     build: ./requirements/mariadb
     container_name: mariadb
-    image: mariadb
     restart: always
     volumes:
       - /home/falberti/data/mariadb_data:/var/lib/mysql
