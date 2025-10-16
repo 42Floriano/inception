@@ -6,9 +6,7 @@ services:
       - "443:443"
     restart: always
     volumes:
-      - /home/falberti/data/wp_files:/var/www/html
-    depends_on:
-      - wordpress
+      - wordpress_data:/var/www/html
     networks:
       - inception_network
 
@@ -17,7 +15,7 @@ services:
     container_name: wordpress
     restart: always
     volumes:
-      - /home/falberti/data/wp_files:/var/www/html
+      - wordpress_data:/var/www/html
     env_file:
       - .env
     depends_on:
@@ -30,15 +28,26 @@ services:
     container_name: mariadb
     restart: always
     volumes:
-      - /home/falberti/data/mariadb_data:/var/lib/mysql
+      - mariadb_data:/var/lib/mysql
     env_file:
       - .env
     networks:
       - inception_network
 
 volumes:
-  wp_files:
+  wordpress_data:
+    driver: local
+    driver_opts:
+      type: none
+      device: /home/falberti/data/wordpress
+      o: bind
+
   mariadb_data:
+    driver: local
+    driver_opts:
+      type: none
+      device: /home/falberti/data/mariadb
+      o: bind
 
 networks:
   inception_network:
